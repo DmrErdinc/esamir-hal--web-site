@@ -1,0 +1,258 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// AUTH
+// ============================================================
+
+model User {
+  id        String   @id @default(cuid())
+  name      String?
+  email     String   @unique
+  password  String
+  role      Role     @default(ADMIN)
+  avatar    String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@map("users")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+}
+
+// ============================================================
+// CATEGORIES
+// ============================================================
+
+model Category {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  description String?    @db.Text
+  seoTitle    String?
+  seoDesc     String?    @db.Text
+  coverImage  String?
+  bannerImage String?
+  order       Int        @default(0)
+  isActive    Boolean    @default(true)
+  isFeatured  Boolean    @default(false)
+  promoText   String?    @db.Text
+  parentId    String?
+  parent      Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryTree")
+  products    Product[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([slug])
+  @@index([parentId])
+  @@index([isActive, order])
+  @@map("categories")
+}
+
+// ============================================================
+// PRODUCTS
+// ============================================================
+
+model Product {
+  id          String         @id @default(cuid())
+  name        String
+  sku         String?        @unique
+  slug        String         @unique
+  shortDesc   String?        @db.Text
+  description String?        @db.Text
+  categoryId  String?
+  category    Category?      @relation(fields: [categoryId], references: [id])
+  images      ProductImage[]
+  dimensions  String?
+  material    String?
+  color       String?
+  inStock     Boolean        @default(true)
+  price       Decimal?       @db.Decimal(10, 2)
+  showPrice   Boolean        @default(false)
+  isFeatured  Boolean        @default(false)
+  isNew       Boolean        @default(false)
+  isActive    Boolean        @default(true)
+  seoTitle    String?
+  seoDesc     String?        @db.Text
+  specs       Json?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([isActive, isFeatured])
+  @@index([isActive, isNew])
+  @@map("products")
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  url       String
+  alt       String?
+  order     Int      @default(0)
+  isCover   Boolean  @default(false)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+  @@map("product_images")
+}
+
+// ============================================================
+// BLOG
+// ============================================================
+
+model BlogCategory {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  description String?    @db.Text
+  posts       BlogPost[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([slug])
+  @@map("blog_categories")
+}
+
+model BlogPost {
+  id          String        @id @default(cuid())
+  title       String
+  slug        String        @unique
+  excerpt     String?       @db.Text
+  content     String        @db.Text
+  coverImage  String?
+  authorName  String?
+  categoryId  String?
+  category    BlogCategory? @relation(fields: [categoryId], references: [id])
+  isPublished Boolean       @default(false)
+  isFeatured  Boolean       @default(false)
+  seoTitle    String?
+  seoDesc     String?       @db.Text
+  publishedAt DateTime?
+  readTime    Int?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([slug])
+  @@index([isPublished])
+  @@index([categoryId])
+  @@index([isPublished, isFeatured])
+  @@map("blog_posts")
+}
+
+// ============================================================
+// SITE SETTINGS (key-value store)
+// ============================================================
+
+model SiteSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String?  @db.Text
+  type      String   @default("text")
+  group     String   @default("general")
+  label     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+  @@index([group])
+  @@map("site_settings")
+}
+
+// ============================================================
+// MEDIA
+// ============================================================
+
+model MediaAsset {
+  id        String   @id @default(cuid())
+  filename  String
+  url       String
+  mimeType  String?
+  size      Int?
+  width     Int?
+  height    Int?
+  alt       String?
+  folder    String?
+  createdAt DateTime @default(now())
+
+  @@index([folder])
+  @@map("media_assets")
+}
+
+// ============================================================
+// PAGES
+// ============================================================
+
+model Page {
+  id          String         @id @default(cuid())
+  title       String
+  slug        String         @unique
+  content     String?        @db.Text
+  isPublished Boolean        @default(true)
+  seoTitle    String?
+  seoDesc     String?        @db.Text
+  template    String?        @default("default")
+  order       Int            @default(0)
+  blocks      ContentBlock[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([slug])
+  @@index([isPublished])
+  @@map("pages")
+}
+
+model ContentBlock {
+  id       String   @id @default(cuid())
+  key      String
+  type     String
+  content  Json?
+  order    Int      @default(0)
+  isActive Boolean  @default(true)
+  pageId   String?
+  page     Page?    @relation(fields: [pageId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+  @@index([pageId])
+  @@map("content_blocks")
+}
+
+// ============================================================
+// MENU
+// ============================================================
+
+model MenuItem {
+  id       String     @id @default(cuid())
+  label    String
+  href     String
+  order    Int        @default(0)
+  target   String?    @default("_self")
+  isActive Boolean    @default(true)
+  parentId String?
+  parent   MenuItem?  @relation("MenuTree", fields: [parentId], references: [id])
+  children MenuItem[] @relation("MenuTree")
+  menuSlot String     @default("header")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([menuSlot])
+  @@index([parentId])
+  @@map("menu_items")
+}

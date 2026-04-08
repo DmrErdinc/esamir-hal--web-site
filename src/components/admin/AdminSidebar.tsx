@@ -241,6 +241,7 @@ export function AdminSidebar() {
     <>
       {/* Desktop sidebar */}
       <aside
+        suppressHydrationWarning
         className={cn(
           "hidden lg:flex flex-col flex-shrink-0 transition-all duration-200 ease-in-out relative",
           collapsed ? "w-[60px]" : "w-[240px]"

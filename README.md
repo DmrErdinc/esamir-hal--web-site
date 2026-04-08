@@ -25,13 +25,13 @@
 <div align="center">
 
 **Ana Sayfa**
-![Ana Sayfa](https://via.placeholder.com/800x450/F5F5DC/8B6F47?text=Ana+Sayfa+-+Hero+Section+%2B+Featured+Products)
+![Ana Sayfa](screenshots/homepage.png)
 
 **Ürün Detay**
-![Ürün Detay](https://via.placeholder.com/800x450/FFFFFF/8B6F47?text=Ürün+Detay+-+Gallery+%2B+Specs+%2B+WhatsApp)
+![Ürün Detay](screenshots/product-detail.png)
 
 **Kategoriler**
-![Kategoriler](https://via.placeholder.com/800x450/F5F5DC/8B6F47?text=Kategoriler+-+Grid+Layout+%2B+Filters)
+![Kategoriler](screenshots/categories.png)
 
 </div>
 
@@ -40,13 +40,13 @@
 <div align="center">
 
 **Dashboard**
-![Dashboard](https://via.placeholder.com/800x450/1E293B/FFFFFF?text=Admin+Dashboard+-+Stats+%2B+Quick+Actions)
+![Dashboard](screenshots/admin-dashboard.png)
 
 **Ürün Yönetimi**
-![Ürün Yönetimi](https://via.placeholder.com/800x450/1E293B/FFFFFF?text=Ürün+Yönetimi+-+CRUD+%2B+Drag+Drop+Images)
+![Ürün Yönetimi](screenshots/admin-products.png)
 
 **Medya Kütüphanesi**
-![Medya Kütüphanesi](https://via.placeholder.com/800x450/1E293B/FFFFFF?text=Medya+Kütüphanesi+-+Upload+%2B+Gallery)
+![Medya Kütüphanesi](screenshots/admin-media.png)
 
 </div>
 

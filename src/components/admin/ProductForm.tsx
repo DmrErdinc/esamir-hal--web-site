@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, X, Upload } from "lucide-react";
+import { Loader2, X, Upload, GripVertical } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -101,6 +101,33 @@ export function ProductForm({ categories, product }: ProductFormProps) {
 
   function removeImage(idx: number) {
     setImages((prev) => prev.filter((_, i) => i !== idx));
+  }
+
+  function moveImage(fromIndex: number, toIndex: number) {
+    setImages((prev) => {
+      const newImages = [...prev];
+      const [movedImage] = newImages.splice(fromIndex, 1);
+      newImages.splice(toIndex, 0, movedImage);
+      return newImages;
+    });
+  }
+
+  function handleDragStart(e: React.DragEvent, index: number) {
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", index.toString());
+  }
+
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  }
+
+  function handleDrop(e: React.DragEvent, dropIndex: number) {
+    e.preventDefault();
+    const dragIndex = parseInt(e.dataTransfer.getData("text/plain"));
+    if (dragIndex !== dropIndex) {
+      moveImage(dragIndex, dropIndex);
+    }
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -276,18 +303,46 @@ export function ProductForm({ categories, product }: ProductFormProps) {
         <div className="space-y-6">
           {/* Images */}
           <div className="bg-white border border-gray-200 rounded-sm p-6 space-y-4">
-            <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Görseller</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Görseller</h2>
+              {images.length > 0 && (
+                <span className="text-xs text-gray-500">Sürükle & bırak ile sırala</span>
+              )}
+            </div>
             <div className="grid grid-cols-3 gap-2">
               {images.map((img, idx) => (
-                <div key={idx} className="relative aspect-square bg-gray-100 overflow-hidden group">
+                <div
+                  key={idx}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, idx)}
+                  onDragOver={handleDragOver}
+                  onDrop={(e) => handleDrop(e, idx)}
+                  className="relative aspect-square bg-gray-100 overflow-hidden group cursor-move"
+                >
                   <img src={img.url} alt={img.alt} className="w-full h-full object-cover" />
+                  
+                  {/* Drag Handle */}
+                  <div className="absolute top-1 left-1 p-1 bg-black/50 text-white rounded-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                    <GripVertical className="h-3 w-3" />
+                  </div>
+                  
+                  {/* Cover Badge */}
                   {idx === 0 && (
-                    <span className="absolute top-1 left-1 bg-brand-700 text-white text-xs px-1 py-0.5 rounded-sm leading-none">Kapak</span>
+                    <span className="absolute top-1 left-1/2 -translate-x-1/2 bg-brand-700 text-white text-xs px-2 py-0.5 rounded-sm leading-none font-medium">
+                      Kapak
+                    </span>
                   )}
+                  
+                  {/* Order Number */}
+                  <span className="absolute bottom-1 left-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded-sm leading-none font-medium">
+                    {idx + 1}
+                  </span>
+                  
+                  {/* Remove Button */}
                   <button
                     type="button"
                     onClick={() => removeImage(idx)}
-                    className="absolute top-1 right-1 p-0.5 bg-red-500 text-white rounded-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -302,6 +357,11 @@ export function ProductForm({ categories, product }: ProductFormProps) {
                 <span className="text-xs">Ekle</span>
               </button>
             </div>
+            {images.length > 0 && (
+              <p className="text-xs text-gray-500 mt-2">
+                İlk görsel otomatik olarak kapak görseli olur. Sıralamayı değiştirmek için görselleri sürükleyin.
+              </p>
+            )}
           </div>
 
           {/* Category */}

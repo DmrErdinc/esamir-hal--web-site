@@ -835,7 +835,7 @@ Bu proje özel bir projedir. Tüm hakları saklıdır.
 
 ### Teknik Destek
 - **E-posta:** eraydemir300@gmail.com
-- **GitHub:** [Issues](https://github.com/DmrErdinc/esamir-hal--web-site)
+- **GitHub:** [Issues](https://github.com/DmrErdinc/esamir-hali-web-site)
 - **Teşefon:**05527189160
 
 ### Sosyal Medya
